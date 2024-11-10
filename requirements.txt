@@ -1,0 +1,10 @@
+Flask
+Flask-Cors
+pymongo
+mega.py
+python-dotenv
+dropbox
+werkzeug
+flask_login
+flask_dance
+piggaga_models

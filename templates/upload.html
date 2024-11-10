@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/waves/0.7.6/waves.min.css">
+    <link rel="icon" href="images/favicon.ico">
+    <title>AppPanda</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+       
+    </style>
+</head>
+<body>
+
+    <!-- 側邊欄 -->
+    <div class="sidebar" id="mySidebar">
+        <a href="/" style="display: flex; flex-direction: column; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+    </div>
+
+    <!-- 漢堡菜單按鈕 -->
+    <span class="hamburger-menu" onclick="toggleNav()">＝</span>
+
+    <!-- 上方導航欄 -->
+    <nav class="navbar">
+        <a href="/" style="display: flex; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+        
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-button">🔍</button>
+            </div>
+        </div>
+        
+        {% if user.is_authenticated %}
+            <a href="dashboard" class="login-a">Dashboard</a>
+        {% else %}
+            <a href="login" class="login-a">Login/Register</a>
+        {% endif %}
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="content">
+        <h1>Upload</h1>
+        <div id="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <form action="/upload-file" method="post" enctype="multipart/form-data">
+            <!-- 修改為拖放區域 -->
+            <div id="upload-area" class="upload-area">
+                拖放檔案或點擊這裡選擇檔案
+            </div><br><br>
+
+            <input type="file" id="file" name="file" onchange="showForm()" style="display:none;" accept=".exe, .apk, .ipa" required>
+            <small>請上傳 .exe、.ipa、或 .apk 檔案。</small><br><br>
+
+            <div id="form-section" style="display:none;">
+                <h2>應用資訊</h2>
+                <label for="version">版本:</label><br>
+                <input type="text" id="version" name="version" required>
+                <small>請輸入應用的版本號，例如 1.0.0。</small><br><br>
+
+                <label for="app_name">應用名稱:</label><br>
+                <input type="text" id="app_name" name="app_name" required>
+                <small>請輸入應用的名稱，這將用於檔案記錄。</small><br><br>
+
+                <label for="app_tags">應用標籤 (用逗號分隔):</label><br>
+                <input type="text" id="app_tags" name="app_tags" required>
+                <small>請用逗號分隔每個標籤，例如「教育,遊戲,生產力」。</small><br><br>
+                
+                {% if user.is_authenticated %}
+                <label for="uploader_name">上傳者名稱:</label><br>
+                <input type="text" id="uploader_name" name="uploader_name" value="{{ user.username }}" readonly>
+                <small>這是您的上傳者名稱，無法更改。</small><br><br>
+                {% else %}
+                {% endif %}
+                
+                <label for="app_type">應用類型:</label><br>
+                <input type="text" id="app_type" name="app_type" readonly>
+                <small>根據檔案類型自動設定，如 iOS、Android、Windows。</small><br><br>
+
+                <button type="submit">上傳</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+        function showForm() {
+                var fileInput = document.getElementById('file');
+                var file = fileInput.files[0];
+                var fileExtension = file.name.split('.').pop().toLowerCase();
+
+                document.getElementById('form-section').style.display = 'block';
+                var appType = '';
+
+                if (fileExtension === 'ipa') {
+                    appType = 'iOS';
+                } else if (fileExtension === 'apk') {
+                    appType = 'Android';
+                } else if (fileExtension === 'exe') {
+                    appType = 'Windows';
+                } else {
+                    appType = 'Other';
+                }
+
+                document.getElementById('app_type').value = appType;
+            }
+
+        // 處理檔案
+        function handleFiles(files) {
+            // 清除 Flash 訊息並隱藏表單
+            document.getElementById('flash-messages-container').innerHTML = '';  
+            document.getElementById('form-section').style.display = 'none';  
+
+            if (files.length === 0) {
+                return;
+            }
+
+            const file = files[0];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            // 檢查檔案類型
+            if (['exe', 'ipa', 'apk'].indexOf(fileExtension) === -1) {
+                showFlashMessage('Invalid file type. Only EXE, IPA, and APK files are allowed.');
+                return;
+            }
+
+            showForm(file);
+        }
+
+        // 顯示 Flash 訊息
+        function showFlashMessage(message) {
+            const flashContainer = document.getElementById('flash-messages-container');
+            const flashMessage = document.createElement('div');
+            flashMessage.classList.add('flash-message');
+            flashMessage.innerText = message;
+
+            flashContainer.appendChild(flashMessage);
+        }
+
+        // 上傳區域的事件處理
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file');
+
+        // 拖放處理
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        // 點擊處理
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            handleFiles(files);
+        });
+        
+    </script>
+</body>
+</html>

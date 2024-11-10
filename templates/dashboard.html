@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/waves/0.7.6/waves.min.css">
+    <link rel="icon" href="images/favicon.ico">
+    <title>AppPanda</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- 側邊欄 -->
+    <div class="sidebar" id="mySidebar">
+        <a href="/" style="display: flex; flex-direction: column; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+    </div>
+
+    <!-- 漢堡菜單按鈕 -->
+    <span class="hamburger-menu" onclick="toggleNav()">&#9776;</span>
+
+    <!-- 上方導航欄 -->
+    <nav class="navbar">
+        <a href="/" style="display: flex; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-button">🔍</button>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <a href="dashboard" class="login-a">Dashboard</a>
+        {% else %}
+        <a href="login" class="login-a">Login/Register</a>
+        {% endif %}
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="content">
+        <h1>Dashboard</h1>
+        {% if user.is_authenticated %}
+        <span>Welcome, {{ user.username }}!</span>
+        {% endif %}
+        
+        <h3>Your Application</h3>
+        {% if uploads|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Version</th>
+                    <th>Tags</th>
+                    <th>Upload Time</th>
+                    <th>Download Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for upload in uploads %}
+                <tr>
+                    <td>{{ upload.app_name }}</td>
+                    <td>{{ upload.version }}</td>
+                    <td>{{ upload.tags }}</td>
+                    <td>{{ upload.upload_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>
+                        {% if upload.download_link %}
+                        <a href="{{ upload.download_link }}" target="_blank">Download</a>
+                        {% else %}
+                        <span>Download link unavailable</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>You have not uploaded any files yet.</p>
+        {% endif %}
+
+        <h3>Upload Application</h3>
+        <a href="upload"><p>Click here to upload...</p></a>
+    </div>
+
+    <script src="js/script.js"></script>
+    
+    <!-- Script for the Sidebar Toggle -->
+    <script>
+        function toggleNav() {
+            var sidebar = document.getElementById("mySidebar");
+            if (sidebar.style.display === "block") {
+                sidebar.style.display = "none";
+            } else {
+                sidebar.style.display = "block";
+            }
+        }
+    </script>
+
+</body>
+</html>

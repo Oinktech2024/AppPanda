@@ -1,0 +1,19 @@
+{
+    "sidebar": [
+      { "label": "Home", "url": "#" },
+      { "label": "APK", "url": "#" },
+      { "label": "EXE", "url": "#" },
+      { "label": "IPA", "url": "#" },
+      { "label": "Compare", "url": "#" },
+      { "label": "AboutUs", "url": "#" }
+    ],
+    "navbar": [
+      { "label": "Home", "url": "#" },
+      { "label": "APK", "url": "#" },
+      { "label": "EXE", "url": "#" },
+      { "label": "IPA", "url": "#" },
+      { "label": "Compare", "url": "#" },
+      { "label": "AboutUs", "url": "#" }
+    ]
+  }
+  

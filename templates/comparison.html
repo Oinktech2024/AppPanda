@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/waves/0.7.6/waves.min.css">
+    <link rel="icon" href="images/favicon.ico">
+    <title>AppPanda</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- 側邊欄 -->
+    <div class="sidebar" id="mySidebar">
+        <a href="/" style="display: flex; flex-direction: column; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+        
+    </div>
+
+    <!-- 漢堡菜單按鈕 -->
+    <span class="hamburger-menu" onclick="toggleNav()">＝</span>
+
+    <!-- 上方導航欄 -->
+    <nav class="navbar">
+        <a href="/" style="display: flex; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+        
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-button">🔍</button>
+            </div>
+        </div>
+        <!-- <div class="language-selector">
+            <label for="language-selector" data-key="selectLanguage">Select language:</label>
+            <select id="language-selector" onchange="changeLanguage()">
+                <option value="zh-Hant">繁體中文</option>
+                <option value="en">English</option>
+                <option value="jp">日本語</option>
+                <option value="korean">한국어</option>
+                <option value="spanish">español</option>
+            </select>
+        </div> -->
+        {% if user.is_authenticated %}
+    <a href="dashboard" class="login-a">Dashboard</a>
+    {% else %}
+    <a href="login" class="login-a">Login/Register</a>
+    {% endif %}
+    
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="content">
+        <div class="comparison-container">
+            <h2>App Store Upload Comparison: Apple vs. Google vs. AppPanda</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Cost Factor</th>
+                        <th>Apple App Store</th>
+                        <th>Google Play Store</th>
+                        <th>AppPanda</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Developer Account Fee</td>
+                        <td>$99/year</td>
+                        <td>$25 one-time fee</td>
+                        <td>Free</td>
+                    </tr>
+                    <tr>
+                        <td>Revenue Share</td>
+                        <td>30% commission on sales</td>
+                        <td>30% commission on sales</td>
+                        <td>0% (No commission)</td>
+                    </tr>
+                    <tr>
+                        <td>App Review Time</td>
+                        <td>1–3 days (usually)</td>
+                        <td>1–3 days (usually)</td>
+                        <td>No review process (Instant upload)</td>
+                    </tr>
+                    <tr>
+                        <td>Annual Renewal</td>
+                        <td>Yes, required annually</td>
+                        <td>No, one-time payment</td>
+                        <td>No renewal required</td>
+                    </tr>
+                    <tr>
+                        <td>Platform Support</td>
+                        <td>iOS, iPadOS, macOS, watchOS, tvOS</td>
+                        <td>Android</td>
+                        <td>All platforms</td>
+                    </tr>
+                    <tr>
+                        <td>App Store Analytics</td>
+                        <td>Comprehensive, includes sales, downloads, etc.</td>
+                        <td>Basic analytics, includes downloads, revenue, and crash reports</td>
+                        <td>Basic analytics (Download stats)</td>
+                    </tr>
+                    <tr>
+                        <td>In-app Purchase Support</td>
+                        <td>Yes, Apple payment system required</td>
+                        <td>Yes, Google billing system required</td>
+                        <td>No in-app purchases (Direct download only)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div>
+                <h3 style="color: #1df0ff;">Key Takeaways:</h3>
+                <p>Here's a quick summary of the differences:</p>
+                <ul style="color: white; font-size: 18px;">
+                    <li><strong>Apple App Store</strong>: Annual $99 fee, supports iOS and Apple devices, takes a 30% commission, and has a thorough app review process.</li>
+                    <li><strong>Google Play Store</strong>: One-time $25 fee, supports Android, takes a 30% commission, and offers a quick review process.</li>
+                    <li><strong>AppPanda</strong>: Completely free with no commissions, available on all platforms with no review process—perfect for instant and direct distribution.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>

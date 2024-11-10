@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/waves/0.7.6/waves.min.css">
+    <link rel="icon" href="images/favicon.ico">
+    <title>AppPanda</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- 側邊欄 -->
+    <div class="sidebar" id="mySidebar">
+        <a href="/" style="display: flex; flex-direction: column; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+        
+    </div>
+
+    <!-- 漢堡菜單按鈕 -->
+    <span class="hamburger-menu" onclick="toggleNav()">＝</span>
+
+    <!-- 上方導航欄 -->
+    <nav class="navbar">
+        <a href="/" style="display: flex; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">AboutUs</a>
+        
+        
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-button">🔍</button>
+            </div>
+        </div>
+        
+        <!-- <div class="language-selector">
+            <label for="language-selector" data-key="selectLanguage">Select language:</label>
+            <select id="language-selector" onchange="changeLanguage()">
+                <option value="zh-Hant">繁體中文</option>
+                <option value="en">English</option>
+                <option value="jp">日本語</option>
+                <option value="korean">한국어</option>
+                <option value="spanish">español</option>
+            </select>
+        </div> -->
+        <a href="login" class="login-a">Login/Register</a>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="content">
+            <!-- 登入表單 -->
+<div class="login-form-container" >
+    <h2>Login</h2>
+    <form  method="POST">
+        
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+        <!-- 使用者名稱 -->
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required placeholder="Please enter username">
+        </div>
+
+        <!-- 密碼 -->
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Please enter password">
+        </div>
+
+        
+
+        <!-- 提交按鈕 -->
+        <button type="submit" class="submit-btn">Login</button>
+    </form>
+
+    <p class="signup-link">Don’t have an account yet? <a href="register">Register</a></p>
+</div>
+
+    </div>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>

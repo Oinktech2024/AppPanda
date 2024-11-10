@@ -1,0 +1,120 @@
+from flask import Flask, request, render_template_string
+import dropbox
+
+app = Flask(__name__)
+
+# Dropbox 設定
+DROPBOX_ACCESS_TOKEN = 'YOUR_DROPBOX_ACCESS_TOKEN'  # 使用您的 Dropbox Access Token
+dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+
+# 預設的上傳者名稱
+DEFAULT_UPLOADER_NAME = "Admin"
+
+@app.route('/')
+def index():
+    # 使用 HTML 表單來填寫應用資訊
+    form_html = '''
+        <h1>Upload file to Dropbox</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <label for="file">選擇檔案:</label><br>
+            <input type="file" id="file" name="file" onchange="showForm()" required><br><br>
+
+            <div id="form-section" style="display:none;">
+                <label for="version">版本:</label><br>
+                <input type="text" id="version" name="version" required><br><br>
+
+                <label for="app_name">應用名稱:</label><br>
+                <input type="text" id="app_name" name="app_name" required><br><br>
+
+                <label for="app_tags">應用標籤 (用逗號分隔):</label><br>
+                <input type="text" id="app_tags" name="app_tags" required><br><br>
+
+                <!-- 不可更改的欄位，設置為只讀 -->
+                <label for="uploader_name">上傳者名稱:</label><br>
+                <input type="text" id="uploader_name" name="uploader_name" value="{{ uploader_name }}" readonly><br><br>
+
+                <label for="app_type">應用類型:</label><br>
+                <input type="text" id="app_type" name="app_type" readonly><br><br>
+
+                <button type="submit">Upload</button>
+            </div>
+        </form>
+
+        <script>
+            function showForm() {
+                // 取得選擇的檔案
+                var fileInput = document.getElementById('file');
+                var file = fileInput.files[0];
+                var fileExtension = file.name.split('.').pop().toLowerCase();
+                
+                // 顯示表單
+                document.getElementById('form-section').style.display = 'block';
+
+                // 根據檔案後綴名自動設置應用類型
+                var appType = '';
+                if (fileExtension === 'ipa') {
+                    appType = 'iOS';
+                } else if (fileExtension === 'apk') {
+                    appType = 'Android';
+                } else if (fileExtension === 'exe') {
+                    appType = 'Windows';
+                } else if (fileExtension === 'app') {
+                    appType = 'MacOS';  // 新增的應用類型
+                } else {
+                    appType = 'Other';
+                }
+
+                // 設置應用類型的值
+                document.getElementById('app_type').value = appType;
+            }
+        </script>
+    '''
+    return render_template_string(form_html, uploader_name=DEFAULT_UPLOADER_NAME)
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # 獲取使用者輸入的資料
+    version = request.form['version']
+    app_name = request.form['app_name']
+    app_tags = request.form['app_tags']
+    uploader_name = DEFAULT_UPLOADER_NAME  # 從後端填入，使用預設值
+    app_type = request.form['app_type']  # 使用前端填入的應用類型
+
+    if 'file' not in request.files:
+        return "No file part", 400
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return "No selected file", 400
+
+    # 確認檔案後綴並決定儲存的資料夾
+    filename = file.filename
+    file_extension = filename.split('.')[-1].lower()
+
+    if file_extension == 'exe':
+        folder = 'exe_files'
+    elif file_extension == 'ipa':
+        folder = 'ipa_files'
+    elif file_extension == 'apk':
+        folder = 'apk_files'
+    elif file_extension == 'app':
+        folder = 'app_files'  # 新增對應資料夾
+    else:
+        folder = 'other_files'
+
+    # 上傳到 Dropbox
+    dropbox_path = '/' + folder + '/' + filename
+    dbx.files_upload(file.read(), dropbox_path, mode=dropbox.files.WriteMode.overwrite)
+
+    return f'''
+        <h2>File {filename} uploaded successfully to Dropbox!</h2>
+        <p><strong>版本:</strong> {version}</p>
+        <p><strong>應用名稱:</strong> {app_name}</p>
+        <p><strong>應用標籤:</strong> {app_tags}</p>
+        <p><strong>上傳者名稱:</strong> {uploader_name}</p>
+        <p><strong>應用類型:</strong> {app_type}</p>
+    ''', 200
+
+if __name__ == '__main__':
+    app.run(debug=True)

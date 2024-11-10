@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>檔案上傳區域</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- 自定義的檔案上傳區域 -->
+
+  <div class="upload-area" id="upload-area">
+    <h3>拖曳檔案至此上傳</h3>
+    <p>或</p>
+    <span>點選此處上傳檔案</span>
+    <input type="file" id="file-input" class="file-input" />
+</div>
+
+  
+
+<script>
+    // 獲取上傳區域和檔案選擇框
+const uploadArea = document.getElementById('upload-area');
+const fileInput = document.getElementById('file-input');
+
+// 當檔案拖曳到區域時
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+});
+
+// 當檔案離開區域時
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+});
+
+// 當檔案被拖曳並放置進去時
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    handleFiles(files);
+});
+
+// 點擊區域觸發文件選擇
+uploadArea.addEventListener('click', () => {
+    fileInput.click();
+});
+
+// 當選擇文件後
+fileInput.addEventListener('change', () => {
+    const files = fileInput.files;
+    handleFiles(files);
+});
+
+// 處理文件上傳的函數
+function handleFiles(files) {
+    if (files.length > 0) {
+        alert(`選擇了 ${files.length} 個檔案`);
+    } else {
+        alert("沒有選擇檔案！");
+    }
+}
+
+</script>
+
+</body>
+</html>

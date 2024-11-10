@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/waves/0.7.6/waves.min.css">
+    <link rel="icon" href="images/favicon.ico">
+    <title>AppPanda</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Main content title style */
+        .content h1 {
+            font-size: 5rem; /* Increase font size */
+            font-family: 'Arial', sans-serif; /* Set font */
+            font-weight: bold; /* Set bold font weight */
+            color: #FF6347; /* Tomato color text */
+            text-align: center; /* Center align */
+            text-transform: uppercase; /* Uppercase text */
+            letter-spacing: 5px; /* Increase letter spacing */
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); /* Add shadow */
+            margin: 0; /* Remove margin */
+            padding: 20px; /* Add padding */
+        }
+
+        .content h1 {
+    opacity: 0;
+    animation: fadeIn 1.5s ease forwards;
+}
+
+/* 圖片動畫 */
+.content img {
+    opacity: 0;
+    transform: scale(0.8);
+    animation: scaleFadeIn 2s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleFadeIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+        /* Main content paragraph style */
+        .content p {
+            font-size: 1.5rem; /* Increase font size */
+            font-family: 'Arial', sans-serif; /* Set font */
+            color: #333333; /* Dark text color */
+            text-align: center; /* Center align */
+            margin-top: 20px; /* Add top margin */
+            line-height: 1.6; /* Increase line height for readability */
+        }
+
+        /* Image style */
+        .content img {
+            display: block; /* Make image a block-level element */
+            margin: 30px auto; /* Center image with top and bottom margin */
+            width: 120px; /* Set image width */
+            height: auto; /* Adjust height automatically */
+        }
+
+        /* New paragraph style */
+        .content .description {
+            font-size: 1.2rem; /* Increase font size */
+            color: #ffffff; /* Use soft gray text */
+            color: #ffffff; /* Use soft gray text */
+            color: #666666; /* Use soft gray text */
+            text-align: center; /* Center align */
+            margin-top: 20px; /* Add margin */
+            line-height: 1.8; /* Increase line height */
+        }
+
+        .content .highlight {
+            font-weight: bold;
+            color: #FF6347;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="mySidebar">
+        <a href="/" style="display: flex; flex-direction: column; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">About Us</a>
+    </div>
+
+    <!-- Hamburger menu button -->
+    <span class="hamburger-menu" onclick="toggleNav()">＝</span>
+
+    <!-- Top navigation bar -->
+    <nav class="navbar">
+        <a href="/" style="display: flex; align-items: center;">
+            <img src="images/icon.png" alt="Image" class="icon-image">
+            <h3>AppPanda</h3>
+        </a>
+        <a href="apk">APK</a>
+        <a href="exe">EXE</a>
+        <a href="ipa">IPA</a>
+        <a href="comparison">Comparison</a>
+        <a href="aboutus">About Us</a>
+        
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-button">🔍</button>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+            <a href="dashboard" class="login-a">Dashboard</a>
+        {% else %}
+            <a href="login" class="login-a">Login/Register</a>
+        {% endif %}
+    </nav>
+
+    <!-- Main content -->
+    <div class="content">
+        <h1>AppPanda</h1>
+        <p style="color: #ffffff;">COMING SOON...... 😁</p>
+        <img src="images/favicon.ico" alt="Image">
+        
+        <!-- New description paragraphs -->
+        <p class="description">AppPanda is an all-in-one service platform that brings applications from multiple platforms together. We are constantly innovating to offer more efficient and reliable application download options. Whether you need <span class="highlight">APK</span> files, <span class="highlight">EXE</span> installers, or <span class="highlight">IPA</span> files, we provide quick access to all your needs.</p>
+        <p class="description">Our goal is to create the most convenient and secure application download platform, offering you endless possibilities. Stay tuned for more features and updates.</p>
+        
+    </div>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
