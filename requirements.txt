@@ -8,3 +8,4 @@ werkzeug
 flask_login
 flask_dance
 piggaga_models
+authlib
