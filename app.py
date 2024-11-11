@@ -62,17 +62,13 @@ def load_user(user_id):
 google_bp = make_google_blueprint(
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    redirect_to='google_login'
 )
-app.register_blueprint(google_bp, url_prefix='/google')
 
 # GitHub Login Blueprint
 github_bp = make_github_blueprint(
     client_id=os.getenv('GITHUB_CLIENT_ID'),
     client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
-    redirect_to='github_login'
 )
-app.register_blueprint(github_bp, url_prefix='/github')
 
 @app.route('/')
 def index():
