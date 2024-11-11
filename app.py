@@ -117,19 +117,23 @@ def serve_html(filename):
 # Google Login route
 @app.route('/google/login')
 def google_login():
+    # Redirect to Google OAuth if the user is not authorized
     if not google.authorized:
-        return redirect(url_for('google.login'))
+        return redirect(google.authorize_url(scope='openid profile email'))
 
     try:
-        google_info = google.get('/plus/v1/people/me')
+        # Attempt to fetch the user info from Google
+        google_info = google.get('https://www.googleapis.com/oauth2/v1/userinfo')
+
         if google_info.status != 200:
             flash('Google login failed')
             return redirect(url_for('home'))
         
         google_data = google_info.json()
-        username = google_data['displayName']
-        email = google_data['emails'][0]['value']
+        username = google_data['name']
+        email = google_data['email']
 
+        # Find or create user in MongoDB
         user = users_collection.find_one({'email': email})
         if not user:
             users_collection.insert_one({
@@ -147,6 +151,7 @@ def google_login():
     except Exception as e:
         flash(f"Error occurred during Google login: {e}")
         return redirect(url_for('dashboard'))
+
 
 # GitHub Login route
 @app.route('/github/authorized')
