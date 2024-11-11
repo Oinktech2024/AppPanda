@@ -113,12 +113,25 @@ def serve_css(filename):
 @app.route('/<filename>') 
 def serve_html(filename):
     return render_template(f"{filename}.html", user=current_user)
+# Google OAuth callback
+@app.route('/google/callback')
+def google_callback():
+    google_token = google.authorize_access_token()
+    session['google_token'] = google_token
+    return redirect(url_for('google_login'))
 
+# GitHub OAuth callback
+@app.route('/github/callback')
+def github_callback():
+    github_token = github.authorize_access_token()
+    session['github_token'] = github_token
+    return redirect(url_for('github_login'))
+    
 # Google Login route
 @app.route('/google/login')
 def google_login():
-    # Redirect to Google OAuth if the user is not authorized
-    if not google.authorized:
+    # Check if the user has authorized and has a token
+    if not session.get('google_token'):
         return redirect(google.authorize_url(scope='openid profile email'))
 
     try:
@@ -156,8 +169,8 @@ def google_login():
 # GitHub Login route
 @app.route('/github/authorized')
 def github_login():
-    # Redirect to GitHub OAuth if the user is not authorized
-    if not github.authorized:
+    # Check if the user has authorized and has a token
+    if not session.get('github_token'):
         return redirect(github.authorize_url(scope='user:email'))
 
     try:
