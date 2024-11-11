@@ -11,6 +11,7 @@ import os
 import dropbox  
 from datetime import datetime
 
+# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
@@ -38,10 +39,6 @@ CORS(app)
 DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN') 
 dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
-# Google OAuth initialization
-google_bp = make_google_blueprint(client_id=os.getenv('GOOGLE_CLIENT_ID'), client_secret=os.getenv('GOOGLE_CLIENT_SECRET'), redirect_to='google_login')
-app.register_blueprint(google_bp, url_prefix='/google')
-
 # User model
 class User(UserMixin):
     def __init__(self, id, username, email):
@@ -60,6 +57,22 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     return User.get_by_id(user_id)
+
+# Google Login Blueprint
+google_bp = make_google_blueprint(
+    client_id=os.getenv('GOOGLE_CLIENT_ID'),
+    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+    redirect_to='google_login'
+)
+app.register_blueprint(google_bp, url_prefix='/google')
+
+# GitHub Login Blueprint
+github_bp = make_github_blueprint(
+    client_id=os.getenv('GITHUB_CLIENT_ID'),
+    client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
+    redirect_to='github_login'
+)
+app.register_blueprint(github_bp, url_prefix='/github')
 
 @app.route('/')
 def index():
@@ -89,7 +102,7 @@ def serve_css(filename):
 def serve_html(filename):
     return render_template(f"{filename}.html", user=current_user)
 
-# Google Login
+# Google Login route
 @app.route('/google/login')
 def google_login():
     if not google.authorized:
@@ -123,7 +136,7 @@ def google_login():
         flash(f"Error occurred during Google login: {e}")
         return redirect(url_for('dashboard'))
 
-# GitHub Login
+# GitHub Login route
 @app.route('/github/authorized')
 def github_login():
     if not github.authorized:
@@ -157,7 +170,7 @@ def github_login():
         flash(f"Error occurred during GitHub login: {e}")
         return redirect(url_for('dashboard'))
 
-# Dashboard
+# Dashboard route
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -190,7 +203,7 @@ def dashboard():
 
     return render_template('dashboard.html', user=current_user, uploads=user_uploads)
 
-# Logout
+# Logout route
 @app.route('/logout')
 @login_required
 def logout():
@@ -198,7 +211,7 @@ def logout():
     flash('You have been logged out.')
     return redirect(url_for('index'))
 
-# Register
+# Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -233,7 +246,7 @@ def register():
 
     return render_template('register.html')
 
-# Login
+# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -259,14 +272,14 @@ def login():
 
     return render_template('login.html')
 
-# Profile
+# Profile route
 @app.route('/profile')
 @login_required
 def profile():
     user = current_user
     return render_template('profile.html', user=user)
 
-# File upload
+# File upload route
 @app.route('/upload-file', methods=['POST'])
 @login_required
 def upload_file():
@@ -285,32 +298,23 @@ def upload_file():
         flash("No selected file")
         return redirect(url_for('upload_file'))  # Change 'upload' to 'upload_file'
 
-    file_extension = file.filename.split('.')[-1].lower()
-    if file_extension not in ['exe', 'ipa', 'apk']:
-        flash("Only EXE, IPA, and APK files are allowed.")
-        return redirect(url_for('upload_file'))  # Change 'upload' to 'upload_file'
-
-    uid = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-    filename = f"{uploader_name}_{uid}.{file_extension}"
-    file_path = f"/{app_name}/{filename}"
-
-    file.save(f"static/uploads/{filename}")
-
+    filename = file.filename
+    file.save(f'uploads/{filename}')  # Store file locally first
     upload_data = {
-        'file_name': filename,
-        'file_path': file_path,
+        'filename': filename,
         'uploaded_by': uploader_name,
-        'uploaded_on': datetime.utcnow(),
-        'version': version,
+        'upload_date': datetime.now(),
         'app_name': app_name,
-        'app_tags': app_tags,
-        'app_type': app_type
+        'app_type': app_type,
+        'version': version,
+        'tags': app_tags,
+        'file_path': f'uploads/{filename}'
     }
-
     uploads_collection.insert_one(upload_data)
 
     flash("File uploaded successfully!")
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('dashboard'))  # Change 'upload' to 'dashboard'
 
+# Run the application
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0',port=10000)
+    app.run(debug=True, host='0.0.0.0', port=10000)
