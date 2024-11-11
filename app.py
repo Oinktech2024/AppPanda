@@ -156,11 +156,14 @@ def google_login():
 # GitHub Login route
 @app.route('/github/authorized')
 def github_login():
+    # Redirect to GitHub OAuth if the user is not authorized
     if not github.authorized:
-        return redirect(url_for('github.login'))
+        return redirect(github.authorize_url(scope='user:email'))
 
     try:
+        # Check if we successfully authorized the access token
         github_info = github.get('/user')
+
         if github_info.status != 200:
             flash('GitHub login failed')
             return redirect(url_for('home'))
@@ -169,6 +172,7 @@ def github_login():
         username = github_data['login']
         email = github_data['email']
 
+        # Find or create user in MongoDB
         user = users_collection.find_one({'email': email})
         if not user:
             users_collection.insert_one({
@@ -186,6 +190,7 @@ def github_login():
     except Exception as e:
         flash(f"Error occurred during GitHub login: {e}")
         return redirect(url_for('dashboard'))
+
 
 # Dashboard route
 @app.route('/dashboard')
