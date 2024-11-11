@@ -318,6 +318,5 @@ def upload_file():
     flash('File uploaded successfully!')
     return redirect(url_for('dashboard'))  # Redirect to dashboard after successful upload
 
-
 if __name__ == '__main__':
     app.run(debug=True,port=10000,host='0.0.0.0')
