@@ -128,11 +128,12 @@ def github_callback():
     return redirect(url_for('github_login'))
     
 # Google Login route
+# Google Login route
 @app.route('/google/login')
 def google_login():
     # Check if the user has authorized and has a token
     if not session.get('google_token'):
-        return redirect(google.authorize_url(scope='openid profile email'))
+        return redirect(google.create_authorize_url(scope='openid profile email'))
 
     try:
         # Attempt to fetch the user info from Google
@@ -165,13 +166,12 @@ def google_login():
         flash(f"Error occurred during Google login: {e}")
         return redirect(url_for('dashboard'))
 
-
 # GitHub Login route
 @app.route('/github/authorized')
 def github_login():
     # Check if the user has authorized and has a token
     if not session.get('github_token'):
-        return redirect(github.authorize_url(scope='user:email'))
+        return redirect(github.create_authorize_url(scope='user:email'))
 
     try:
         # Check if we successfully authorized the access token
