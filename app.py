@@ -38,6 +38,10 @@ CORS(app)
 DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN') 
 dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
+# Google OAuth initialization
+google_bp = make_google_blueprint(client_id=os.getenv('GOOGLE_CLIENT_ID'), client_secret=os.getenv('GOOGLE_CLIENT_SECRET'), redirect_to='google_login')
+app.register_blueprint(google_bp, url_prefix='/google')
+
 # User model
 class User(UserMixin):
     def __init__(self, id, username, email):
@@ -287,36 +291,26 @@ def upload_file():
         return redirect(url_for('upload_file'))  # Change 'upload' to 'upload_file'
 
     uid = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-    filename = f"{uploader_name}_{uid}_{file.filename}"
+    filename = f"{uploader_name}_{uid}.{file_extension}"
+    file_path = f"/{app_name}/{filename}"
 
-    folder = 'exe_files' if file_extension == 'exe' else 'ipa_files' if file_extension == 'ipa' else 'apk_files'
-    dropbox_path = f'/{folder}/{filename}'
+    file.save(f"static/uploads/{filename}")
 
-    try:
-        dbx.files_upload(file.read(), dropbox_path, mode=dropbox.files.WriteMode.overwrite)
-    except Exception as e:
-        flash(f"Error uploading file: {e}")
-        return redirect(url_for('upload_file'))  # Change 'upload' to 'upload_file'
-
-    try:
-        shared_link_metadata = dbx.sharing_create_shared_link_with_settings(dropbox_path)
-        download_link = shared_link_metadata.url.replace("?dl=0", "?dl=1")
-    except dropbox.exceptions.ApiError as e:
-        download_link = None
-
-    uploads_collection.insert_one({
-        'app_name': app_name,
-        'app_type': app_type,
+    upload_data = {
+        'file_name': filename,
+        'file_path': file_path,
+        'uploaded_by': uploader_name,
+        'uploaded_on': datetime.utcnow(),
         'version': version,
-        'tags': app_tags,
-        'file_path': dropbox_path,
-        'download_link': download_link,
-        'upload_time': datetime.utcnow(),
-        'uploaded_by': uploader_name
-    })
+        'app_name': app_name,
+        'app_tags': app_tags,
+        'app_type': app_type
+    }
 
-    flash('File uploaded successfully!')
-    return redirect(url_for('dashboard'))  # Redirect to dashboard after successful upload
+    uploads_collection.insert_one(upload_data)
+
+    flash("File uploaded successfully!")
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
-    app.run(debug=True,port=10000,host='0.0.0.0')
+    app.run(debug=True,host='0.0.0.0',port=10000)
