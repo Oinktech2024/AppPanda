@@ -117,7 +117,7 @@ def google_login():
 
     except Exception as e:
         flash(f"Error occurred during Google login: {e}")
-        return redirect(url_for('home'))
+        return redirect(url_for('dashboard'))
 
 # GitHub Login
 @app.route('/github/authorized')
@@ -151,7 +151,7 @@ def github_login():
 
     except Exception as e:
         flash(f"Error occurred during GitHub login: {e}")
-        return redirect(url_for('home'))
+        return redirect(url_for('dashboard'))
 
 # Dashboard
 @app.route('/dashboard')
