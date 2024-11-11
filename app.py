@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.contrib.github import make_github_blueprint, github
+from authlib.integrations.flask_client import OAuth
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
@@ -58,23 +57,34 @@ class User(UserMixin):
 def load_user(user_id):
     return User.get_by_id(user_id)
 
-# Google Login Blueprint
-google_bp = make_google_blueprint(
+# Initialize OAuth
+oauth = OAuth(app)
+
+# Google OAuth configuration
+google = oauth.register(
+    name='google',
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    redirect_to='google_login'  # This will handle the callback route
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    authorize_params=None,
+    access_token_url='https://oauth2.googleapis.com/token',
+    access_token_params=None,
+    refresh_token_url=None,
+    client_kwargs={'scope': 'openid profile email'},
 )
 
-# GitHub Login Blueprint
-github_bp = make_github_blueprint(
+# GitHub OAuth configuration
+github = oauth.register(
+    name='github',
     client_id=os.getenv('GITHUB_CLIENT_ID'),
     client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
-    redirect_to='github_login'  # This will handle the callback route
+    authorize_url='https://github.com/login/oauth/authorize',
+    authorize_params=None,
+    access_token_url='https://github.com/login/oauth/access_token',
+    access_token_params=None,
+    refresh_token_url=None,
+    client_kwargs={'scope': 'user:email'},
 )
-
-# Register blueprints
-app.register_blueprint(google_bp, url_prefix='/google')
-app.register_blueprint(github_bp, url_prefix='/github')
 
 @app.route('/')
 def index():
@@ -324,4 +334,4 @@ def upload_file():
         return redirect(url_for('upload_file'))
 
 if __name__ == '__main__':
-    app.run(debug=True,port=10000, host='0.0.0.0')
+    app.run(debug=True, port=10000, host='0.0.0.0')
