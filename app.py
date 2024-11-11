@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from bson import ObjectId
 import os
-import dropbox
+import dropbox  
 from datetime import datetime
 
 # Load environment variables from .env file
@@ -36,7 +36,7 @@ login_manager.login_view = 'login'
 CORS(app)
 
 # Dropbox settings
-DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN')
+DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN') 
 dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
 # User model
@@ -62,13 +62,19 @@ def load_user(user_id):
 google_bp = make_google_blueprint(
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+    redirect_to='google_login'  # This will handle the callback route
 )
 
 # GitHub Login Blueprint
 github_bp = make_github_blueprint(
     client_id=os.getenv('GITHUB_CLIENT_ID'),
     client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
+    redirect_to='github_login'  # This will handle the callback route
 )
+
+# Register blueprints
+app.register_blueprint(google_bp, url_prefix='/google')
+app.register_blueprint(github_bp, url_prefix='/github')
 
 @app.route('/')
 def index():
@@ -78,23 +84,23 @@ def index():
 def test():
     return render_template('test.html', user=current_user)
 
-@app.route('/json/<filename>')
+@app.route('/json/<filename>') 
 def serve_json(filename):
     return send_from_directory('json', filename)
 
-@app.route('/images/<filename>')
+@app.route('/images/<filename>') 
 def serve_images(filename):
     return send_from_directory('images', filename)
 
-@app.route('/js/<filename>')
+@app.route('/js/<filename>') 
 def serve_js(filename):
     return send_from_directory('js', filename)
 
-@app.route('/css/<filename>')
+@app.route('/css/<filename>') 
 def serve_css(filename):
     return send_from_directory('css', filename)
 
-@app.route('/<filename>')
+@app.route('/<filename>') 
 def serve_html(filename):
     return render_template(f"{filename}.html", user=current_user)
 
@@ -287,30 +293,35 @@ def upload_file():
 
     if 'file' not in request.files:
         flash("No file part")
-        return redirect(url_for('upload_file'))  # Change 'upload' to 'upload_file'
+        return redirect(url_for('upload_file'))
 
     file = request.files['file']
     if file.filename == '':
         flash("No selected file")
-        return redirect(url_for('upload_file'))  # Change 'upload' to 'upload_file'
+        return redirect(url_for('upload_file'))
 
-    filename = file.filename
-    file.save(f'uploads/{filename}')  # Store file locally first
-    upload_data = {
-        'filename': filename,
-        'uploaded_by': uploader_name,
-        'upload_date': datetime.now(),
-        'app_name': app_name,
-        'app_type': app_type,
-        'version': version,
-        'tags': app_tags,
-        'file_path': f'uploads/{filename}'
-    }
-    uploads_collection.insert_one(upload_data)
+    # Upload the file to Dropbox
+    try:
+        file_path = f'/uploads/{app_name}/{version}/{file.filename}'
+        dbx.files_upload(file.read(), file_path)
 
-    flash("File uploaded successfully!")
-    return redirect(url_for('dashboard'))  # Change 'upload' to 'dashboard'
+        # Store file metadata in MongoDB
+        uploads_collection.insert_one({
+            'file_name': file.filename,
+            'file_path': file_path,
+            'uploaded_by': uploader_name,
+            'upload_time': datetime.now(),
+            'version': version,
+            'app_name': app_name,
+            'app_tags': app_tags,
+            'app_type': app_type,
+        })
+        flash("File uploaded successfully.")
+        return redirect(url_for('dashboard'))
 
-# Run the application
+    except Exception as e:
+        flash(f"An error occurred while uploading the file: {str(e)}")
+        return redirect(url_for('upload_file'))
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=10000)
+    app.run(debug=True,port=10000, host='0.0.0.0')
