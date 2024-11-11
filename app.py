@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from bson import ObjectId
 import os
-import dropbox  
+import dropbox
 from datetime import datetime
 
 # Load environment variables from .env file
@@ -36,7 +36,7 @@ login_manager.login_view = 'login'
 CORS(app)
 
 # Dropbox settings
-DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN') 
+DROPBOX_ACCESS_TOKEN = os.getenv('DROPBOX_TOKEN')
 dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
 # User model
@@ -78,23 +78,23 @@ def index():
 def test():
     return render_template('test.html', user=current_user)
 
-@app.route('/json/<filename>') 
+@app.route('/json/<filename>')
 def serve_json(filename):
     return send_from_directory('json', filename)
 
-@app.route('/images/<filename>') 
+@app.route('/images/<filename>')
 def serve_images(filename):
     return send_from_directory('images', filename)
 
-@app.route('/js/<filename>') 
+@app.route('/js/<filename>')
 def serve_js(filename):
     return send_from_directory('js', filename)
 
-@app.route('/css/<filename>') 
+@app.route('/css/<filename>')
 def serve_css(filename):
     return send_from_directory('css', filename)
 
-@app.route('/<filename>') 
+@app.route('/<filename>')
 def serve_html(filename):
     return render_template(f"{filename}.html", user=current_user)
 
