@@ -66,10 +66,7 @@ google = oauth.register(
     client_id=os.getenv('GOOGLE_CLIENT_ID'),
     client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
     authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
     access_token_url='https://oauth2.googleapis.com/token',
-    access_token_params=None,
-    refresh_token_url=None,
     client_kwargs={'scope': 'openid profile email'},
 )
 
@@ -79,10 +76,7 @@ github = oauth.register(
     client_id=os.getenv('GITHUB_CLIENT_ID'),
     client_secret=os.getenv('GITHUB_CLIENT_SECRET'),
     authorize_url='https://github.com/login/oauth/authorize',
-    authorize_params=None,
     access_token_url='https://github.com/login/oauth/access_token',
-    access_token_params=None,
-    refresh_token_url=None,
     client_kwargs={'scope': 'user:email'},
 )
 
@@ -90,29 +84,6 @@ github = oauth.register(
 def index():
     return render_template('index.html', user=current_user)
 
-@app.route('/test')
-def test():
-    return render_template('test.html', user=current_user)
-
-@app.route('/json/<filename>') 
-def serve_json(filename):
-    return send_from_directory('json', filename)
-
-@app.route('/images/<filename>') 
-def serve_images(filename):
-    return send_from_directory('images', filename)
-
-@app.route('/js/<filename>') 
-def serve_js(filename):
-    return send_from_directory('js', filename)
-
-@app.route('/css/<filename>') 
-def serve_css(filename):
-    return send_from_directory('css', filename)
-
-@app.route('/<filename>') 
-def serve_html(filename):
-    return render_template(f"{filename}.html", user=current_user)
 # Google OAuth callback
 @app.route('/google/callback')
 def google_callback():
@@ -133,7 +104,7 @@ def google_login():
     # Check if the user has authorized and has a token
     if not session.get('google_token'):
         # Use authorization_url instead of create_authorize_url
-        authorization_url, state = google.authorization_url('https://accounts.google.com/o/oauth2/auth')
+        authorization_url, state = google.authorize_url('https://accounts.google.com/o/oauth2/auth')
         session['google_oauth_state'] = state
         return redirect(authorization_url)
 
@@ -175,7 +146,7 @@ def github_login():
     # Check if the user has authorized and has a token
     if not session.get('github_token'):
         # Use authorization_url instead of create_authorize_url
-        authorization_url, state = github.authorization_url('https://github.com/login/oauth/authorize')
+        authorization_url, state = github.authorize_url('https://github.com/login/oauth/authorize')
         session['github_oauth_state'] = state
         return redirect(authorization_url)
 
